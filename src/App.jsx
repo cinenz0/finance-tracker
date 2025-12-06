@@ -26,7 +26,7 @@ function App() {
       <FinanceProvider>
         <div style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: 'var(--notion-bg)', color: 'var(--notion-text)' }}>
           <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-          <main style={{ flex: 1, overflowY: 'auto' }}>
+          <main style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
             {renderContent()}
           </main>
         </div>

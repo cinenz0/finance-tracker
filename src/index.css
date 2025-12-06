@@ -105,16 +105,21 @@ h6 {
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-  background: transparent;
+  width: 8px;
+  height: 8px;
+  background: var(--notion-bg);
+  /* Match background so track is invisible */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d3d1cb;
-  border-radius: 5px;
+  background: var(--notion-border);
+  border-radius: 4px;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--notion-text-gray);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--notion-bg);
 }
