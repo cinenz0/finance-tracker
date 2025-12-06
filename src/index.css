@@ -103,23 +103,10 @@ h6 {
   margin-bottom: 0.5rem;
 }
 
-/* Scrollbar */
+/* Scrollbar - Hiddden */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-  background: var(--notion-bg);
-  /* Match background so track is invisible */
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--notion-border);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--notion-text-gray);
-}
-
-::-webkit-scrollbar-corner {
-  background: var(--notion-bg);
+  width: 0px;
+  height: 0px;
+  background: transparent;
+  display: none;
 }

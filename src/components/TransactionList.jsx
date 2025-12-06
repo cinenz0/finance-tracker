@@ -361,7 +361,7 @@ const TransactionList = ({ title, transactions, onAdd, onEdit }) => {
                                     style={{
                                         padding: '8px 4px', fontSize: '14px',
                                         color: 'var(--notion-text-gray)',
-                                        borderBottom: '1px solid var(--notion-border)',
+                                        borderBottom: 'none', // Removed border to prevent bottom artifact
                                         cursor: 'pointer',
                                         display: 'flex', alignItems: 'center', gap: '8px'
                                     }}
