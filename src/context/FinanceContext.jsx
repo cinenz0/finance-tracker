@@ -16,6 +16,17 @@ export const FinanceProvider = ({ children }) => {
         }
     });
 
+    // Initialize investments from LocalStorage
+    const [investments, setInvestments] = useState(() => {
+        try {
+            const stored = localStorage.getItem('finance_app_investments');
+            return stored ? JSON.parse(stored) : [];
+        } catch (error) {
+            console.error('Failed to load investments:', error);
+            return [];
+        }
+    });
+
     // We don't need real loading state for local storage, but keeping it for compatibility
     const [loading, setLoading] = useState(false);
 
@@ -28,18 +39,23 @@ export const FinanceProvider = ({ children }) => {
         }
     }, [transactions]);
 
+    // Persist investments
+    useEffect(() => {
+        try {
+            localStorage.setItem('finance_app_investments', JSON.stringify(investments));
+        } catch (error) {
+            console.error('Failed to save investments:', error);
+        }
+    }, [investments]);
+
     const addTransaction = async (newTransaction) => {
-        // Create a local transaction object with a unique ID
         const transaction = {
             id: crypto.randomUUID(),
             ...newTransaction,
-            amount: parseFloat(newTransaction.amount), // Ensure number
+            amount: parseFloat(newTransaction.amount),
             created_at: new Date().toISOString()
         };
-
         setTransactions(prev => [transaction, ...prev]);
-
-        // Return a resolved promise to satisfy await
         return Promise.resolve(transaction);
     };
 
@@ -52,6 +68,28 @@ export const FinanceProvider = ({ children }) => {
             t.id === updatedTransaction.id ? { ...t, ...updatedTransaction } : t
         ));
         return Promise.resolve(updatedTransaction);
+    };
+
+    const addInvestment = async (newInvestment) => {
+        const investment = {
+            id: crypto.randomUUID(),
+            ...newInvestment,
+            amount: parseFloat(newInvestment.amount),
+            created_at: new Date().toISOString()
+        };
+        setInvestments(prev => [investment, ...prev]);
+        return Promise.resolve(investment);
+    };
+
+    const deleteInvestment = (id) => {
+        setInvestments(prev => prev.filter(i => i.id !== id));
+    };
+
+    const updateInvestment = async (updated) => {
+        setInvestments(prev => prev.map(i =>
+            i.id === updated.id ? { ...i, ...updated } : i
+        ));
+        return Promise.resolve(updated);
     };
 
     // --- Derived Data Calculations (Same as before) ---
@@ -110,6 +148,21 @@ export const FinanceProvider = ({ children }) => {
         return Object.values(grouped);
     };
 
+    const calculatePortfolioBreakdown = () => {
+        const data = investments.reduce((acc, item) => {
+            const type = item.type || 'Other';
+            if (!acc[type]) acc[type] = 0;
+            acc[type] += item.amount;
+            return acc;
+        }, {});
+
+        return Object.entries(data).map(([name, value], index) => ({
+            name,
+            value,
+            color: ['#00B8D9', '#36B37E', '#FFAB00', '#FF5630', '#6554C0'][index % 5]
+        }));
+    };
+
     const value = {
         transactions,
         addTransaction,
@@ -120,6 +173,11 @@ export const FinanceProvider = ({ children }) => {
         incomeBreakdown: calculateBreakdown('income'),
         expensesBreakdown: calculateBreakdown('expense'),
         monthlySummaries: calculateSummaries(),
+        investments,
+        addInvestment,
+        deleteInvestment,
+        updateInvestment,
+        portfolioBreakdown: calculatePortfolioBreakdown()
     };
 
     return (

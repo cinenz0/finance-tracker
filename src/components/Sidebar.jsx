@@ -13,6 +13,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'expenses', label: 'Expenses', icon: Wallet },
         { id: 'income', label: 'Income', icon: TrendingUp },
+        { id: 'investments', label: 'Investments', icon: PiggyBank },
         { id: 'tags', label: 'Tags', icon: Tag },
     ];
 

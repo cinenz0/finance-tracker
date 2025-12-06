@@ -6,6 +6,7 @@ import { SettingsProvider } from './context/SettingsContext';
 import Dashboard from './components/Dashboard';
 import Expenses from './components/Expenses';
 import Income from './components/Income';
+import Investments from './components/Investments';
 import TagsManager from './components/TagsManager';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
       case 'dashboard': return <Dashboard />;
       case 'expenses': return <Expenses />;
       case 'income': return <Income />;
+      case 'investments': return <Investments />;
       case 'tags': return <TagsManager />;
       default: return <Dashboard />;
     }
