@@ -24,9 +24,9 @@ function App() {
   return (
     <SettingsProvider>
       <FinanceProvider>
-        <div style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: 'var(--notion-bg)', color: 'var(--notion-text)' }}>
+        <div style={{ display: 'flex', height: '100vh', width: '100%', backgroundColor: 'var(--notion-bg)', color: 'var(--notion-text)', overflow: 'hidden' }}>
           <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-          <main style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+          <main style={{ flex: 1, height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
             {renderContent()}
           </main>
         </div>

@@ -52,13 +52,12 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
             width: '240px',
             backgroundColor: 'var(--notion-bg-gray)',
             borderRight: '1px solid var(--notion-border)',
-            minHeight: '100vh',
+            height: '100%',
             padding: '12px 0 0 0',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            position: 'sticky',
-            top: 0
+            // position: 'sticky' removed as parent is fixed height
         }}>
             <input
                 type="file"
