@@ -74,6 +74,10 @@ html,
 body {
   width: 100%;
   height: 100%;
+  background-color: var(--notion-bg);
+  /* Ensure no white bleed */
+  overflow-x: hidden;
+  /* Prevent horizontal scrollbar lines */
 }
 
 #root {
