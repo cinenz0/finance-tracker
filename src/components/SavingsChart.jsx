@@ -14,7 +14,7 @@ const SavingsChart = ({ data }) => {
                             <stop offset="95%" stopColor="var(--chart-blue)" stopOpacity={0} />
                         </linearGradient>
                     </defs>
-                    <CartesianGrid vertical={true} horizontal={true} strokeDasharray="3 3" stroke="#f0f0f0" />
+                    {/* Grid removed to clean up UI */}
                     <XAxis
                         dataKey="month"
                         axisLine={false}

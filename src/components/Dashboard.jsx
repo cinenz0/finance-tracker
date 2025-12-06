@@ -91,7 +91,7 @@ const Dashboard = () => {
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={savingsData}>
                                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9b9a97' }} />
-                                <Tooltip formatter={(value) => `R$ ${value.toLocaleString('pt-BR')}`} contentStyle={{ borderRadius: '4px', border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
+                                <Tooltip cursor={false} formatter={(value) => `R$ ${value.toLocaleString('pt-BR')}`} contentStyle={{ borderRadius: '4px', border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
                                 <Line type="monotone" dataKey="amount" stroke="#5b9bf1" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
                             </LineChart>
                         </ResponsiveContainer>
