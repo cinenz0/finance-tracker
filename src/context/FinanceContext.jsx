@@ -156,10 +156,9 @@ export const FinanceProvider = ({ children }) => {
             return acc;
         }, {});
 
-        return Object.entries(data).map(([name, value], index) => ({
+        return Object.entries(data).map(([name, value]) => ({
             name,
-            value,
-            color: ['#00B8D9', '#36B37E', '#FFAB00', '#FF5630', '#6554C0'][index % 5]
+            value
         }));
     };
 

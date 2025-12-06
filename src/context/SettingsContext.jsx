@@ -33,6 +33,21 @@ export const SettingsProvider = ({ children }) => {
         ];
     });
 
+    // Investment Types Registry
+    const [investmentTypes, setInvestmentTypes] = useState(() => {
+        const stored = localStorage.getItem('finance_app_investment_types');
+        return stored ? JSON.parse(stored) : [
+            { id: '1', name: 'CDB', color: 'blue' },
+            { id: '2', name: 'LCI', color: 'green' },
+            { id: '3', name: 'LCA', color: 'green' },
+            { id: '4', name: 'Stock', color: 'purple' },
+            { id: '5', name: 'FII', color: 'orange' },
+            { id: '6', name: 'Treasury', color: 'yellow' },
+            { id: '7', name: 'Crypto', color: 'gray' },
+            { id: '8', name: 'Other', color: 'default' },
+        ];
+    });
+
     // Notion Colors
     const tagColors = {
         default: { bg: '#e3e2e0', text: '#32302c' },
@@ -62,6 +77,11 @@ export const SettingsProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('finance_app_tags', JSON.stringify(tags));
     }, [tags]);
+
+    // Persist investment types
+    useEffect(() => {
+        localStorage.setItem('finance_app_investment_types', JSON.stringify(investmentTypes));
+    }, [investmentTypes]);
 
     // Persist profile image
     useEffect(() => {
@@ -100,6 +120,22 @@ export const SettingsProvider = ({ children }) => {
         setTags(prev => prev.filter(tag => tag.id !== id));
     };
 
+    const addInvestmentType = (name, color) => {
+        const newType = { id: crypto.randomUUID(), name, color };
+        setInvestmentTypes(prev => [...prev, newType]);
+        return newType;
+    };
+
+    const updateInvestmentType = (id, updates) => {
+        setInvestmentTypes(prev => prev.map(t =>
+            t.id === id ? { ...t, ...updates } : t
+        ));
+    };
+
+    const deleteInvestmentType = (id) => {
+        setInvestmentTypes(prev => prev.filter(t => t.id !== id));
+    };
+
     const getContrastColor = (hexcolor) => {
         // If it isn't a valid hex, default to black
         if (!hexcolor || !hexcolor.startsWith('#')) return '#000000';
@@ -134,6 +170,10 @@ export const SettingsProvider = ({ children }) => {
         addTag,
         updateTag,
         deleteTag,
+        investmentTypes,
+        addInvestmentType,
+        updateInvestmentType,
+        deleteInvestmentType,
         tagColors,
         getTagColor
     };
