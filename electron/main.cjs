@@ -25,7 +25,10 @@ function createWindow() {
     win.once('ready-to-show', () => {
         win.maximize();
         win.show();
-        win.focus(); // Force focus so inputs work immediately
+        // Force focus with a slight delay to ensure it catches after the window manager animation
+        setTimeout(() => {
+            win.focus();
+        }, 250);
     });
 
     // Load the app
