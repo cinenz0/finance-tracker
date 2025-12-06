@@ -1,6 +1,7 @@
 import { LayoutDashboard, Wallet, PiggyBank, Settings, ChevronLeft, Moon, Sun, Edit2, AlertTriangle, Tag, TrendingUp, Camera, X } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
 import { useState, useRef } from 'react';
+import pkg from '../../package.json';
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
     const { accountName, theme, toggleTheme, updateAccountName, profileImage, updateProfileImage } = useSettings();
@@ -206,7 +207,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
                     <span>Settings</span>
                 </div>
                 <div style={{ padding: '0 12px 8px 12px', fontSize: '10px', color: 'var(--notion-text-gray)', opacity: 0.5 }}>
-                    v0.0.16
+                    v{pkg.version}
                 </div>
             </div>
         </aside>
