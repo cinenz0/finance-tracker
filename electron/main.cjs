@@ -17,11 +17,16 @@ function createWindow() {
         autoHideMenuBar: true,
         backgroundColor: '#191919', // Match dark theme to prevent white flashes/lines
         title: 'Personal Finance Tracker',
-        icon: path.join(__dirname, '../public/favicon.ico')
+        icon: path.join(__dirname, '../public/favicon.ico'),
+        show: false // Wait until ready to prevent focus issues
     });
 
-    // Optimize view
-    win.maximize();
+    // Optimize view and ensure focus
+    win.once('ready-to-show', () => {
+        win.maximize();
+        win.show();
+        win.focus(); // Force focus so inputs work immediately
+    });
 
     // Load the app
     if (process.env.NODE_ENV === 'development') {
