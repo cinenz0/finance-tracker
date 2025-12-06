@@ -175,8 +175,8 @@ const Investments = () => {
                         </RePieChart>
                     </ResponsiveContainer>
                     {/* Center Text */}
-                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none' }}>
-                        <div style={{ fontSize: '12px', color: 'var(--notion-text-gray)' }}>Total</div>
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -60%)', textAlign: 'center', pointerEvents: 'none' }}>
+                        <div style={{ fontSize: '12px', color: 'var(--notion-text-gray)', marginBottom: '4px' }}>Total</div>
                         <div style={{ fontSize: '18px', fontWeight: 700 }}>{investments.length > 0 ? formatCurrency(totalValue) : 'R$ 0'}</div>
                     </div>
                 </div>
