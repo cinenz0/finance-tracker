@@ -31,6 +31,16 @@ const Dashboard = () => {
     const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
     const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
 
+    const formatCompact = (value) => {
+        if (value >= 1000000) {
+            return `R$ ${(value / 1000000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mi`;
+        }
+        if (value >= 1000) {
+            return `R$ ${(value / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mil`;
+        }
+        return `R$ ${value.toLocaleString('pt-BR')}`;
+    };
+
     return (
         <div style={{ padding: '32px 48px', maxWidth: '1600px', margin: '0 auto', width: '100%' }}>
             <AddTransactionModal
@@ -127,7 +137,7 @@ const Dashboard = () => {
                             </PieChart>
                         </ResponsiveContainer>
                         <div style={{ position: 'absolute', textAlign: 'center' }}>
-                            <div style={{ fontSize: '32px', fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--notion-text)' }}>R$ {income.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })}</div>
+                            <div style={{ fontSize: '32px', fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--notion-text)' }}>{formatCompact(income)}</div>
                             <div style={{ fontSize: '12px', color: 'var(--notion-text-gray)' }}>Total Amount</div>
                         </div>
                     </div>
@@ -170,7 +180,7 @@ const Dashboard = () => {
                             </PieChart>
                         </ResponsiveContainer>
                         <div style={{ position: 'absolute', textAlign: 'center' }}>
-                            <div style={{ fontSize: '32px', fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--notion-text)' }}>R$ {expenses.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })}</div>
+                            <div style={{ fontSize: '32px', fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--notion-text)' }}>{formatCompact(expenses)}</div>
                             <div style={{ fontSize: '12px', color: 'var(--notion-text-gray)' }}>Total Amount</div>
                         </div>
                     </div>
