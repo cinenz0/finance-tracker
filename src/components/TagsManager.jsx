@@ -102,7 +102,7 @@ const TagsManager = () => {
                                 />
                                 <input
                                     type="color"
-                                    value={editColor}
+                                    value={editColor.startsWith('#') ? editColor : getTagColor(editColor).bg}
                                     onChange={(e) => setEditColor(e.target.value)}
                                     style={{ border: 'none', width: '32px', height: '32px', padding: 0, background: 'transparent', cursor: 'pointer' }}
                                 />
