@@ -127,7 +127,7 @@ const Dashboard = () => {
                             </PieChart>
                         </ResponsiveContainer>
                         <div style={{ position: 'absolute', textAlign: 'center' }}>
-                            <div style={{ fontSize: '32px', fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--notion-text)' }}>R$ {income.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                            <div style={{ fontSize: '32px', fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--notion-text)' }}>R$ {income.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })}</div>
                             <div style={{ fontSize: '12px', color: 'var(--notion-text-gray)' }}>Total Amount</div>
                         </div>
                     </div>
@@ -170,7 +170,7 @@ const Dashboard = () => {
                             </PieChart>
                         </ResponsiveContainer>
                         <div style={{ position: 'absolute', textAlign: 'center' }}>
-                            <div style={{ fontSize: '32px', fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--notion-text)' }}>R$ {expenses.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                            <div style={{ fontSize: '32px', fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--notion-text)' }}>R$ {expenses.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })}</div>
                             <div style={{ fontSize: '12px', color: 'var(--notion-text-gray)' }}>Total Amount</div>
                         </div>
                     </div>
