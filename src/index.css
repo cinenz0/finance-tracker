@@ -56,7 +56,10 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  outline: none;
+  /* Remove focus outline */
 }
+
 
 body {
   -webkit-font-smoothing: antialiased;
