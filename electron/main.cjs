@@ -12,6 +12,7 @@ function createWindow() {
             devTools: false
         },
         autoHideMenuBar: true,
+        backgroundColor: '#191919', // Match dark theme to prevent white flashes/lines
         title: 'Personal Finance Tracker',
         icon: path.join(__dirname, '../public/favicon.ico')
     });
