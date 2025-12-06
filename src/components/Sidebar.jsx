@@ -204,6 +204,9 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
                     <Settings size={14} />
                     <span>Settings</span>
                 </div>
+                <div style={{ padding: '0 12px 8px 12px', fontSize: '10px', color: 'var(--notion-text-gray)', opacity: 0.5 }}>
+                    v0.0.16
+                </div>
             </div>
         </aside>
     );

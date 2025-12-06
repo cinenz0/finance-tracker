@@ -81,10 +81,7 @@ const Dashboard = () => {
                         {accountName.charAt(0).toUpperCase()}
                     </div>
                 )}
-                <h1 style={{ fontSize: '40px', fontWeight: 700, margin: 0, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    {accountName}
-                    <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--notion-text-gray)', border: '1px solid var(--notion-border)', padding: '2px 6px', borderRadius: '4px' }}>v0.0.15</span>
-                </h1>
+                <h1 style={{ fontSize: '40px', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>{accountName}</h1>
             </div>
 
             {/* Charts Section - Responsive Flex */}
