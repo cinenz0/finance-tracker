@@ -2,6 +2,9 @@ const { app, BrowserWindow, shell } = require('electron');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
 
+// Disable hardware acceleration to prevent rendering artifacts (white lines, glitches)
+app.disableHardwareAcceleration();
+
 function createWindow() {
     const win = new BrowserWindow({
         width: 1200,
