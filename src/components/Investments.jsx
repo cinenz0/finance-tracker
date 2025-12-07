@@ -104,6 +104,16 @@ const Investments = () => {
         return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     };
 
+    const formatCompact = (value) => {
+        if (value >= 1000000) {
+            return `R$ ${(value / 1000000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mi`;
+        }
+        if (value >= 1000) {
+            return `R$ ${(value / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mil`;
+        }
+        return `R$ ${value.toLocaleString('pt-BR')}`;
+    };
+
     return (
         <div style={{ padding: '32px 48px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
 
@@ -177,7 +187,7 @@ const Investments = () => {
                     {/* Center Text */}
                     <div style={{ position: 'absolute', top: '60%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none' }}>
                         <div style={{ fontSize: '12px', color: 'var(--notion-text-gray)', marginBottom: '4px' }}>Total</div>
-                        <div style={{ fontSize: '18px', fontWeight: 700 }}>{investments.length > 0 ? formatCurrency(totalValue) : 'R$ 0'}</div>
+                        <div style={{ fontSize: '18px', fontWeight: 700 }}>{investments.length > 0 ? formatCompact(totalValue) : 'R$ 0'}</div>
                     </div>
                 </div>
 
