@@ -1,10 +1,14 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { useToast } from './ToastContext';
 
 const FinanceContext = createContext();
 
 export const useFinance = () => useContext(FinanceContext);
 
 export const FinanceProvider = ({ children }) => {
+    const { addToast } = useToast();
+    const processedRecurringRef = useRef(false);
+
     // Initialize transactions from LocalStorage
     const [transactions, setTransactions] = useState(() => {
         try {
@@ -30,6 +34,73 @@ export const FinanceProvider = ({ children }) => {
     // We don't need real loading state for local storage, but keeping it for compatibility
     const [loading, setLoading] = useState(false);
 
+    // AUTOMATION LOGIC
+    useEffect(() => {
+        if (processedRecurringRef.current) return;
+
+        const checkRecurringTransactions = () => {
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            const newTransactions = [];
+
+            // Group by recurringId
+            const recurringGroups = {};
+            transactions.forEach(t => {
+                if (t.isRecurring && t.recurringId) {
+                    if (!recurringGroups[t.recurringId]) {
+                        recurringGroups[t.recurringId] = [];
+                    }
+                    recurringGroups[t.recurringId].push(t);
+                }
+            });
+
+            Object.values(recurringGroups).forEach(group => {
+                // Sort by date descending
+                group.sort((a, b) => new Date(b.date) - new Date(a.date));
+                const latest = group[0];
+                const latestDate = new Date(latest.date);
+
+                // If latest transaction is from a previous month (or year)
+                if (latestDate.getMonth() !== currentMonth || latestDate.getFullYear() !== currentYear) {
+                    // Needs to recur
+                    // Logic: If strict monthly, we just want to ensure we have one for THIS month
+                    // We will create ONE for the current month.
+                    // If missed multiple months? For now, just generate the current month to avoid spam.
+
+                    const originalDay = parseInt(latest.date.split('-')[2]);
+
+                    // CLAMPING LOGIC
+                    // Get last day of current month
+                    const lastDayOfCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                    const targetDay = Math.min(originalDay, lastDayOfCurrentMonth);
+
+                    const targetDateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(targetDay).padStart(2, '0')}`;
+
+                    const newTx = {
+                        ...latest,
+                        id: crypto.randomUUID(),
+                        date: targetDateStr,
+                        created_at: new Date().toISOString()
+                    };
+
+                    newTransactions.push(newTx);
+                }
+            });
+
+            if (newTransactions.length > 0) {
+                setTransactions(prev => [...newTransactions, ...prev]);
+                addToast(`Auto-generated ${newTransactions.length} recurring transactions.`, 'info');
+            }
+
+            processedRecurringRef.current = true;
+        };
+
+        // Slight delay to ensure hydration if needed, but synchronous is fine for now
+        checkRecurringTransactions();
+
+    }, [transactions.length]); // Run once on mount (dep on length to trigger initial check, ref prevents loop)
+
     // Persist to LocalStorage whenever transactions change
     useEffect(() => {
         try {
@@ -53,7 +124,11 @@ export const FinanceProvider = ({ children }) => {
             id: crypto.randomUUID(),
             ...newTransaction,
             amount: parseFloat(newTransaction.amount),
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
+            // Handle Recurring fields
+            isRecurring: newTransaction.isRecurring || false,
+            frequency: newTransaction.isRecurring ? 'monthly' : null,
+            recurringId: newTransaction.isRecurring ? (newTransaction.recurringId || crypto.randomUUID()) : null
         };
         setTransactions(prev => [transaction, ...prev]);
         return Promise.resolve(transaction);

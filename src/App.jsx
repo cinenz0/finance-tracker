@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import { FinanceProvider } from './context/FinanceContext';
 import { SettingsProvider } from './context/SettingsContext';
+import { ToastProvider } from './context/ToastContext';
 
 import Dashboard from './components/Dashboard';
 import Expenses from './components/Expenses';
@@ -25,14 +26,16 @@ function App() {
 
   return (
     <SettingsProvider>
-      <FinanceProvider>
-        <div style={{ display: 'flex', height: '100vh', width: '100%', backgroundColor: 'var(--notion-bg)', color: 'var(--notion-text)', overflow: 'hidden' }}>
-          <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-          <main style={{ flex: 1, height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
-            {renderContent()}
-          </main>
-        </div>
-      </FinanceProvider>
+      <ToastProvider>
+        <FinanceProvider>
+          <div style={{ display: 'flex', height: '100vh', width: '100%', backgroundColor: 'var(--notion-bg)', color: 'var(--notion-text)', overflow: 'hidden' }}>
+            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <main style={{ flex: 1, height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
+              {renderContent()}
+            </main>
+          </div>
+        </FinanceProvider>
+      </ToastProvider>
     </SettingsProvider>
   );
 }

@@ -1,7 +1,7 @@
 {
   "name": "temp-app",
   "private": true,
-  "version": "0.0.24",
+  "version": "0.0.25",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
@@ -10,7 +10,8 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "electron:dev": "concurrently \"cross-env BROWSER=none npm run dev\" \"wait-on http://127.0.0.1:5173 && cross-env NODE_ENV=development electron .\"",
-    "electron:build": "vite build && electron-builder"
+    "electron:build": "vite build && electron-builder",
+    "dist": "npm run build && electron-builder -p always"
   },
   "build": {
     "appId": "com.pichau.finance",

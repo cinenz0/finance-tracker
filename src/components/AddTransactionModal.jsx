@@ -13,7 +13,8 @@ const AddTransactionModal = ({ isOpen, onClose, initialType = 'expense', transac
         date: new Date().toISOString().split('T')[0],
         type: initialType,
         tags: [],
-        icon: 'file-text'
+        icon: 'file-text',
+        isRecurring: false
     });
 
     useEffect(() => {
@@ -26,11 +27,13 @@ const AddTransactionModal = ({ isOpen, onClose, initialType = 'expense', transac
                     date: transactionToEdit.date,
                     type: transactionToEdit.type,
                     tags: transactionToEdit.tags || [],
-                    icon: transactionToEdit.icon || 'file-text'
+                    icon: transactionToEdit.icon || 'file-text',
+                    isRecurring: transactionToEdit.isRecurring || false,
+                    recurringId: transactionToEdit.recurringId
                 });
             } else if (!transactionToEdit && formData.id) {
                 // Wiping if switching from edit to add
-                setFormData({ source: '', amount: '', date: new Date().toISOString().split('T')[0], type: initialType, tags: [], icon: 'file-text' });
+                setFormData({ source: '', amount: '', date: new Date().toISOString().split('T')[0], type: initialType, tags: [], icon: 'file-text', isRecurring: false });
             } else if (!transactionToEdit && formData.type !== initialType && formData.source === '') {
                 setFormData(prev => ({ ...prev, type: initialType }));
             }
@@ -57,7 +60,7 @@ const AddTransactionModal = ({ isOpen, onClose, initialType = 'expense', transac
                 });
             }
             onClose();
-            setFormData({ source: '', amount: '', date: new Date().toISOString().split('T')[0], type: 'expense', tags: [], icon: 'file-text' });
+            setFormData({ source: '', amount: '', date: new Date().toISOString().split('T')[0], type: 'expense', tags: [], icon: 'file-text', isRecurring: false });
         } catch (error) {
             console.error(error);
             alert('Failed to save transaction: ' + (error.message || JSON.stringify(error)));
@@ -153,6 +156,19 @@ const AddTransactionModal = ({ isOpen, onClose, initialType = 'expense', transac
                             selectedTags={formData.tags}
                             onChange={(newTags) => setFormData({ ...formData, tags: newTags })}
                         />
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0' }}>
+                        <input
+                            type="checkbox"
+                            checked={formData.isRecurring || false}
+                            onChange={e => setFormData({ ...formData, isRecurring: e.target.checked })}
+                            style={{ cursor: 'pointer' }}
+                            id="recurring-toggle"
+                        />
+                        <label htmlFor="recurring-toggle" style={{ fontSize: '13px', color: 'var(--notion-text)', cursor: 'pointer' }}>
+                            Repeat Monthly
+                        </label>
                     </div>
 
                     <button
