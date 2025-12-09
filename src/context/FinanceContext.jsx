@@ -31,6 +31,17 @@ export const FinanceProvider = ({ children }) => {
         }
     });
 
+    // Initialize Budget Groups from LocalStorage
+    const [budgetGroups, setBudgetGroups] = useState(() => {
+        try {
+            const stored = localStorage.getItem('finance_app_budget_groups');
+            return stored ? JSON.parse(stored) : [];
+        } catch (error) {
+            console.error('Failed to load budget groups:', error);
+            return [];
+        }
+    });
+
     // We don't need real loading state for local storage, but keeping it for compatibility
     const [loading, setLoading] = useState(false);
 
@@ -118,6 +129,15 @@ export const FinanceProvider = ({ children }) => {
             console.error('Failed to save investments:', error);
         }
     }, [investments]);
+
+    // Persist budgetGroups
+    useEffect(() => {
+        try {
+            localStorage.setItem('finance_app_budget_groups', JSON.stringify(budgetGroups));
+        } catch (error) {
+            console.error('Failed to save budget groups:', error);
+        }
+    }, [budgetGroups]);
 
     const addTransaction = async (newTransaction) => {
         const transaction = {
@@ -280,77 +300,47 @@ export const FinanceProvider = ({ children }) => {
             // Cleanup description
             description = description.replace(/"/g, '').trim();
 
-            // Robust BRL Parsing
-            // 1. Remove R$, whitespace, and other non-numeric chars except . , -
-            // 2. Identify millesimal vs decimal separator
-            // Brazilian format: 1.000,00 -> Remove dots, replace comma with dot
-
-            let cleanAmountStr = rawAmount.replace(/[R$\s"]/g, '');
-            // Check if it's Brazilian format (has comma as decimal separator)
-            if (cleanAmountStr.includes(',') && !cleanAmountStr.includes('.')) {
-                cleanAmountStr = cleanAmountStr.replace(',', '.');
-            } else if (cleanAmountStr.includes('.') && cleanAmountStr.includes(',')) {
-                // Mixed 1.000,00 structure
-                cleanAmountStr = cleanAmountStr.replace(/\./g, '').replace(',', '.');
-            }
-
-            const amount = parseFloat(cleanAmountStr);
-
-            if (isNaN(amount)) continue;
-
-            // Auto-Tagging
-            let assignedTag = null;
-            const lowerDesc = description.toLowerCase();
-            for (const [tag, keywords] of Object.entries(KEYWORD_MAP)) {
-                if (keywords.some(k => lowerDesc.includes(k))) {
-                    assignedTag = tag;
-                    break;
-                }
-            }
-
-            const transaction = {
-                id: crypto.randomUUID(),
-                description: description || 'Imported Transaction',
-                amount: Math.abs(amount),
-                type: amount >= 0 ? 'income' : 'expense',
-                date: new Date().toISOString().split('T')[0], // Default to today for now
-                tags: assignedTag ? [assignedTag] : []
+            const addBudgetGroup = (name, limit, color) => {
+                const newGroup = { id: crypto.randomUUID(), name, limit: parseFloat(limit), color };
+                setBudgetGroups(prev => [...prev, newGroup]);
+                return newGroup;
             };
 
-            if (transaction.type === 'income') incomeCount++;
-            else expenseCount++;
+            const updateBudgetGroup = (id, updates) => {
+                setBudgetGroups(prev => prev.map(g =>
+                    g.id === id ? { ...g, ...updates, limit: updates.limit ? parseFloat(updates.limit) : g.limit } : g
+                ));
+            };
 
-            newTransactions.push(transaction);
-        }
+            const deleteBudgetGroup = (id) => {
+                setBudgetGroups(prev => prev.filter(g => g.id !== id));
+            };
 
-        if (newTransactions.length > 0) {
-            setTransactions(prev => [...newTransactions, ...prev]);
-        }
+            const value = {
+                transactions,
+                addTransaction,
+                deleteTransaction,
+                updateTransaction,
+                loading,
+                savingsData: calculateSavingsData(),
+                incomeBreakdown: calculateBreakdown('income'),
+                expensesBreakdown: calculateBreakdown('expense'),
+                monthlySummaries: calculateSummaries(),
+                investments,
+                addInvestment,
+                deleteInvestment,
+                updateInvestment,
+                portfolioBreakdown: calculatePortfolioBreakdown(),
+                importTransactions,
+                budgetGroups,
+                addBudgetGroup,
+                updateBudgetGroup,
+                deleteBudgetGroup
+            };
 
-        return { success: true, count: newTransactions.length, income: incomeCount, expense: expenseCount };
-    };
-
-    const value = {
-        transactions,
-        addTransaction,
-        deleteTransaction,
-        updateTransaction,
-        loading,
-        savingsData: calculateSavingsData(),
-        incomeBreakdown: calculateBreakdown('income'),
-        expensesBreakdown: calculateBreakdown('expense'),
-        monthlySummaries: calculateSummaries(),
-        investments,
-        addInvestment,
-        deleteInvestment,
-        updateInvestment,
-        portfolioBreakdown: calculatePortfolioBreakdown(),
-        importTransactions
-    };
-
-    return (
-        <FinanceContext.Provider value={value}>
-            {children}
-        </FinanceContext.Provider>
-    );
-};
+            return (
+                <FinanceContext.Provider value={value}>
+                    {children}
+                </FinanceContext.Provider>
+            );
+        };

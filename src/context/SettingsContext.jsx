@@ -104,8 +104,8 @@ export const SettingsProvider = ({ children }) => {
         setProfileImage(dataUrl);
     };
 
-    const addTag = (name, color) => {
-        const newTag = { id: crypto.randomUUID(), name, color };
+    const addTag = (name, color, groupId = null) => {
+        const newTag = { id: crypto.randomUUID(), name, color, groupId };
         setTags(prev => [...prev, newTag]);
         return newTag;
     };

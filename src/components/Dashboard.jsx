@@ -9,11 +9,33 @@ import TransactionList from './TransactionList';
 const COLORS = ['#5b9bf1', '#ea6b6b', '#59b98c', '#d3d1cb'];
 
 const Dashboard = () => {
-    const { transactions, incomeBreakdown, expensesBreakdown, savingsData } = useFinance();
-    const { accountName, profileImage } = useSettings();
+    const { transactions, incomeBreakdown, expensesBreakdown, savingsData, budgetGroups } = useFinance();
+    const { accountName, profileImage, tags } = useSettings();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [initialTab, setInitialTab] = useState('expense'); // 'income' or 'expense'
     const [editingTransaction, setEditingTransaction] = useState(null);
+
+    // Budget Calculations
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+
+    // Helper to get group spending
+    const groupSpending = budgetGroups.map(group => {
+        // Find all tags in this group
+        const groupTagNames = tags.filter(t => t.groupId === group.id).map(t => t.name);
+
+        // Sum expenses for these tags in current month
+        const spent = transactions
+            .filter(t =>
+                t.type === 'expense' &&
+                new Date(t.date).getMonth() === currentMonth &&
+                new Date(t.date).getFullYear() === currentYear &&
+                t.tags && groupTagNames.includes(t.tags[0])
+            )
+            .reduce((sum, t) => sum + t.amount, 0);
+
+        return { ...group, spent };
+    });
 
     const handleOpenModal = (type) => {
         setInitialTab(type);
@@ -83,6 +105,46 @@ const Dashboard = () => {
                 )}
                 <h1 style={{ fontSize: '40px', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>{accountName}</h1>
             </div>
+
+            {/* BUDGET STATUS WIDGET */}
+            {budgetGroups.length > 0 && (
+                <div style={{ marginBottom: '48px' }}>
+                    <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '16px', color: 'var(--notion-text)' }}>Budget Status</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
+                        {groupSpending.map(group => {
+                            const progress = Math.min((group.spent / group.limit) * 100, 100);
+                            const isOver = group.spent > group.limit;
+
+                            return (
+                                <div key={group.id} style={{
+                                    padding: '16px', border: '1px solid var(--notion-border)', borderRadius: '4px',
+                                    background: 'var(--notion-bg)'
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                        <span style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: group.color }}></div>
+                                            {group.name}
+                                        </span>
+                                        <span style={{ fontSize: '14px', color: isOver ? '#ea6b6b' : 'var(--notion-text-gray)' }}>
+                                            R$ {group.spent.toLocaleString()} / R$ {group.limit.toLocaleString()}
+                                        </span>
+                                    </div>
+                                    {/* Progress Bar */}
+                                    <div style={{ height: '8px', width: '100%', background: 'var(--notion-hover)', borderRadius: '4px', overflow: 'hidden' }}>
+                                        <div style={{
+                                            height: '100%',
+                                            width: `${progress}%`,
+                                            background: isOver ? '#ea6b6b' : group.color,
+                                            borderRadius: '4px',
+                                            transition: 'width 0.5s ease-out'
+                                        }}></div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
 
             {/* Charts Section - Responsive Flex */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', marginBottom: '48px' }}>
