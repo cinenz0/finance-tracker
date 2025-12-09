@@ -1,14 +1,18 @@
 import { LayoutDashboard, Wallet, PiggyBank, Settings, ChevronLeft, Moon, Sun, Edit2, AlertTriangle, Tag, TrendingUp, Camera, X } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
+import { useFinance } from '../context/FinanceContext';
 import { useState, useRef } from 'react';
 import pkg from '../../package.json';
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
     const { accountName, theme, toggleTheme, updateAccountName, profileImage, updateProfileImage } = useSettings();
+    const { importTransactions } = useFinance();
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isEditingName, setIsEditingName] = useState(false);
     const [tempName, setTempName] = useState(accountName);
+    const [importStatus, setImportStatus] = useState(null);
     const fileInputRef = useRef(null);
+    const csvInputRef = useRef(null);
 
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -43,6 +47,29 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         }
     };
 
+    const handleCsvImport = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target.result;
+            const result = importTransactions(content);
+            if (result.success) {
+                setImportStatus(`✅ Imported ${result.count} transactions`);
+            } else {
+                setImportStatus('❌ Import failed');
+            }
+
+            // Clear status after 3 seconds
+            setTimeout(() => setImportStatus(null), 3000);
+
+            // Reset input so same file can be selected again if needed
+            if (csvInputRef.current) csvInputRef.current.value = '';
+        };
+        reader.readAsText(file);
+    };
+
     const handleRemovePhoto = () => {
         if (window.confirm('Remove profile photo?')) {
             updateProfileImage(null);
@@ -59,7 +86,6 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            // position: 'sticky' removed as parent is fixed height
         }}>
             <input
                 type="file"
@@ -67,6 +93,14 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
                 style={{ display: 'none' }}
                 accept="image/*"
                 onChange={handleFileChange}
+            />
+
+            <input
+                type="file"
+                ref={csvInputRef}
+                style={{ display: 'none' }}
+                accept=".csv"
+                onChange={handleCsvImport}
             />
 
             {/* Account Switcher / Header */}
@@ -126,6 +160,21 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
                                 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#ea6b6b', cursor: 'pointer', padding: '4px 0' }}
                             >
                                 <X size={12} /> Remove Photo
+                            </div>
+                        )}
+                    </div>
+
+                    {/* CSV Import Section */}
+                    <div style={{ padding: '8px', borderTop: '1px solid var(--notion-border)' }}>
+                        <div
+                            onClick={() => csvInputRef.current.click()}
+                            style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--notion-text)', cursor: 'pointer', padding: '4px 0' }}
+                        >
+                            <Wallet size={12} /> Import Bank Statement
+                        </div>
+                        {importStatus && (
+                            <div style={{ fontSize: '11px', color: importStatus.includes('✅') ? '#59b98c' : '#ea6b6b', marginTop: '4px', paddingLeft: '20px' }}>
+                                {importStatus}
                             </div>
                         )}
                     </div>

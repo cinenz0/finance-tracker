@@ -162,6 +162,99 @@ export const FinanceProvider = ({ children }) => {
         }));
     };
 
+    const KEYWORD_MAP = {
+        'Transporte': ['uber', '99', 'gas', 'parking', 'estacionamento', 'combustivel', 'posto'],
+        'Alimentação': ['ifood', 'rappi', 'market', 'restaurant', 'burger', 'mcdonalds', 'kfc', 'padaria', 'supermercado'],
+        'Lazer': ['netflix', 'steam', 'spotify', 'cinema', 'hbomax', 'amazon prime', 'disney'],
+        'Investimentos': ['brokerage', 'b3', 'treasury', 'corretora', 'nubank', 'inter', 'nuinvest'],
+        'Salario': ['salary', 'payment', 'remuneration', 'pagamento', 'salário']
+    };
+
+    const importTransactions = (csvContent) => {
+        const lines = csvContent.split('\n');
+        let incomeCount = 0;
+        let expenseCount = 0;
+        const newTransactions = [];
+
+        // Simple detection of headers to skip first line if needed
+        const startIndex = lines[0].toLowerCase().includes('date') || lines[0].toLowerCase().includes('description') ? 1 : 0;
+
+        for (let i = startIndex; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+
+            const parts = line.split(','); // Assumes standard CSV
+            if (parts.length < 2) continue;
+
+            // Heuristic: Amount is usually the last or close to last column containing digits
+            // Description is usually the longest string or the one before amount
+            // For MVP, lets assume format: Date, Description, Amount OR Description, Amount
+
+            let description = '';
+            let rawAmount = '';
+
+            if (parts.length === 2) {
+                description = parts[0];
+                rawAmount = parts[1];
+            } else if (parts.length >= 3) {
+                // Try to find the amount column (last numeric-ish column)
+                rawAmount = parts[parts.length - 1];
+                description = parts[1]; // Often 2nd column in bank exports (Date, Desc, Val)
+            }
+
+            // Cleanup description
+            description = description.replace(/"/g, '').trim();
+
+            // Robust BRL Parsing
+            // 1. Remove R$, whitespace, and other non-numeric chars except . , -
+            // 2. Identify millesimal vs decimal separator
+            // Brazilian format: 1.000,00 -> Remove dots, replace comma with dot
+
+            let cleanAmountStr = rawAmount.replace(/[R$\s"]/g, '');
+            // Check if it's Brazilian format (has comma as decimal separator)
+            if (cleanAmountStr.includes(',') && !cleanAmountStr.includes('.')) {
+                cleanAmountStr = cleanAmountStr.replace(',', '.');
+            } else if (cleanAmountStr.includes('.') && cleanAmountStr.includes(',')) {
+                // Mixed 1.000,00 structure
+                cleanAmountStr = cleanAmountStr.replace(/\./g, '').replace(',', '.');
+            }
+
+            const amount = parseFloat(cleanAmountStr);
+
+            if (isNaN(amount)) continue;
+
+            // Auto-Tagging
+            let assignedTag = null;
+            const lowerDesc = description.toLowerCase();
+            for (const [tag, keywords] of Object.entries(KEYWORD_MAP)) {
+                if (keywords.some(k => lowerDesc.includes(k))) {
+                    assignedTag = tag;
+                    break;
+                }
+            }
+
+            const transaction = {
+                id: crypto.randomUUID(),
+                description: description || 'Imported Transaction',
+                amount: Math.abs(amount),
+                type: amount >= 0 ? 'income' : 'expense',
+                date: new Date().toISOString().split('T')[0], // Default to today for now
+                tags: assignedTag ? [assignedTag] : []
+            };
+
+            if (transaction.type === 'income') incomeCount++;
+            else expenseCount++;
+
+            newTransactions.push(transaction);
+        }
+
+        if (newTransactions.length > 0) {
+            setTransactions(prev => [...newTransactions, ...prev]);
+        }
+
+        return { success: true, count: newTransactions.length, income: incomeCount, expense: expenseCount };
+    };
+
     const value = {
         transactions,
         addTransaction,
@@ -176,7 +269,8 @@ export const FinanceProvider = ({ children }) => {
         addInvestment,
         deleteInvestment,
         updateInvestment,
-        portfolioBreakdown: calculatePortfolioBreakdown()
+        portfolioBreakdown: calculatePortfolioBreakdown(),
+        importTransactions
     };
 
     return (
