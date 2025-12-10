@@ -136,8 +136,8 @@ const TagsManager = () => {
                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: tag.color }}></div>
                 <span style={{ fontWeight: 500 }}>{tag.name}</span>
                 <div style={{ marginLeft: '8px', display: 'flex', gap: '4px' }}>
-                    <button onClick={() => startEditingTag(tag)} style={{ ...iconButtonStyle, padding: '2px' }}><Edit2 size={12} /></button>
-                    <button onClick={() => { if (window.confirm(`Delete tag "${tag.name}"?`)) deleteTag(tag.id); }} style={{ ...iconButtonStyle, padding: '2px' }}><Trash2 size={12} /></button>
+                    <button onClick={() => startEditingTag(tag)} style={{ ...iconButtonStyle, color: getTagColor(tag.color).text, opacity: 0.7, padding: '2px' }}><Edit2 size={12} /></button>
+                    <button onClick={() => { if (window.confirm(`Delete tag "${tag.name}"?`)) deleteTag(tag.id); }} style={{ ...iconButtonStyle, color: getTagColor(tag.color).text, opacity: 0.7, padding: '2px' }}><Trash2 size={12} /></button>
                 </div>
             </div>
         );
