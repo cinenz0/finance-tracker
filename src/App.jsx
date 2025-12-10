@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar';
 import { FinanceProvider } from './context/FinanceContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { ToastProvider } from './context/ToastContext';
+import CommandBar from './components/CommandBar';
 
 import Dashboard from './components/Dashboard';
 import Expenses from './components/Expenses';
@@ -28,6 +29,7 @@ function App() {
     <SettingsProvider>
       <ToastProvider>
         <FinanceProvider>
+          <CommandBar />
           <div style={{ display: 'flex', height: '100vh', width: '100%', backgroundColor: 'var(--notion-bg)', color: 'var(--notion-text)', overflow: 'hidden' }}>
             <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
             <main style={{ flex: 1, height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
