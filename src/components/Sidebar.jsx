@@ -1,4 +1,4 @@
-import { LayoutDashboard, Wallet, PiggyBank, Settings, ChevronLeft, Moon, Sun, Edit2, AlertTriangle, Tag, TrendingUp, Camera, X } from 'lucide-react';
+import { LayoutDashboard, Wallet, PiggyBank, Settings, ChevronLeft, Moon, Sun, Edit2, AlertTriangle, Tag, TrendingUp, Camera, X, Database, RotateCcw } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
 import { useFinance } from '../context/FinanceContext';
 import { useState, useRef } from 'react';
@@ -6,7 +6,7 @@ import pkg from '../../package.json';
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
     const { accountName, theme, toggleTheme, updateAccountName, profileImage, updateProfileImage } = useSettings();
-    const { importTransactions } = useFinance();
+    const { importTransactions, exportData, restoreData } = useFinance();
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isEditingName, setIsEditingName] = useState(false);
     const [tempName, setTempName] = useState(accountName);
@@ -198,6 +198,22 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
                                 <Edit2 size={12} /> Rename Account
                             </div>
                         )}
+                    </div>
+
+                    <div style={{ padding: '8px', borderTop: '1px solid var(--notion-border)' }}>
+                        <div style={{ fontSize: '10px', color: 'var(--notion-text-gray)', fontWeight: 600, marginBottom: '4px', textTransform: 'uppercase' }}>Data Resilience</div>
+                        <div
+                            onClick={exportData}
+                            style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--notion-text)', cursor: 'pointer', padding: '4px 0' }}
+                        >
+                            <Database size={12} /> Export Backup Now
+                        </div>
+                        <div
+                            onClick={restoreData}
+                            style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--notion-text)', cursor: 'pointer', padding: '4px 0' }}
+                        >
+                            <RotateCcw size={12} /> Restore Data
+                        </div>
                     </div>
 
                     <div style={{ padding: '8px', borderTop: '1px solid var(--notion-border)' }}>

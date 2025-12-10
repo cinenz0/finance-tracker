@@ -366,6 +366,106 @@ export const FinanceProvider = ({ children }) => {
         setBudgetGroups(prev => prev.filter(g => g.id !== id));
     };
 
+    // --- Data Resilience (Backup/Restore) ---
+
+    const exportData = async () => {
+        const data = {
+            transactionsString: localStorage.getItem('finance_app_transactions'),
+            investmentsString: localStorage.getItem('finance_app_investments'),
+            budgetGroupsString: localStorage.getItem('finance_app_budget_groups'),
+            tagsString: localStorage.getItem('finance_app_tags'),
+            accountName: localStorage.getItem('finance_app_account_name'),
+            profileImage: localStorage.getItem('finance_app_profile_image'),
+            theme: localStorage.getItem('finance_app_theme'),
+            investmentTypesString: localStorage.getItem('finance_app_investment_types'),
+            version: '1.0'
+        };
+
+        if (window.electron) {
+            const result = await window.electron.saveBackup(data);
+            if (result.success) {
+                toast.success('Backup saved successfully!');
+            } else {
+                toast.error('Backup failed: ' + result.error);
+            }
+        } else {
+            // Fallback for web (Download JSON)
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `finance_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    };
+
+    const restoreData = async () => {
+        if (!window.confirm('WARNING: This will overwrite ALL current data with the backup. Continue?')) return;
+
+        let data = null;
+
+        if (window.electron) {
+            const result = await window.electron.loadBackup();
+            if (result.canceled) return;
+            if (result.success) {
+                data = result.data;
+            } else {
+                toast.error('Restore failed: ' + result.error);
+                return;
+            }
+        } else {
+            // Web fallback would need file input, but for now we focus on Desktop
+            toast.error('Restore not supported in web mode yet.');
+            return;
+        }
+
+        if (data) {
+            try {
+                if (data.transactionsString) localStorage.setItem('finance_app_transactions', data.transactionsString);
+                if (data.investmentsString) localStorage.setItem('finance_app_investments', data.investmentsString);
+                if (data.budgetGroupsString) localStorage.setItem('finance_app_budget_groups', data.budgetGroupsString);
+                if (data.tagsString) localStorage.setItem('finance_app_tags', data.tagsString);
+                if (data.accountName) localStorage.setItem('finance_app_account_name', data.accountName);
+                if (data.profileImage) localStorage.setItem('finance_app_profile_image', data.profileImage);
+                if (data.theme) localStorage.setItem('finance_app_theme', data.theme);
+                if (data.investmentTypesString) localStorage.setItem('finance_app_investment_types', data.investmentTypesString);
+
+                toast.success('Data restored! Reloading...');
+                setTimeout(() => window.location.reload(), 1500);
+            } catch (e) {
+                toast.error('Error applying backup data.');
+                console.error(e);
+            }
+        }
+    };
+
+    // Auto-Backup on Startup
+    useEffect(() => {
+        const runAutoBackup = async () => {
+            if (window.electron) {
+                const hasBackup = await window.electron.checkDailyBackup();
+                if (!hasBackup) {
+                    console.log('Running daily auto-backup...');
+                    const data = {
+                        transactionsString: localStorage.getItem('finance_app_transactions'),
+                        investmentsString: localStorage.getItem('finance_app_investments'),
+                        budgetGroupsString: localStorage.getItem('finance_app_budget_groups'),
+                        tagsString: localStorage.getItem('finance_app_tags'),
+                        accountName: localStorage.getItem('finance_app_account_name'),
+                        profileImage: localStorage.getItem('finance_app_profile_image'),
+                        theme: localStorage.getItem('finance_app_theme'),
+                        investmentTypesString: localStorage.getItem('finance_app_investment_types'),
+                        version: '1.0'
+                    };
+                    await window.electron.saveBackup(data); // Filename auto-generated
+                }
+            }
+        };
+        // Delay slightly to ensure data loaded
+        setTimeout(runAutoBackup, 5000);
+    }, []);
+
     const value = {
         transactions,
         addTransaction,
@@ -385,7 +485,9 @@ export const FinanceProvider = ({ children }) => {
         budgetGroups,
         addBudgetGroup,
         updateBudgetGroup,
-        deleteBudgetGroup
+        deleteBudgetGroup,
+        exportData,
+        restoreData
     };
 
     return (
