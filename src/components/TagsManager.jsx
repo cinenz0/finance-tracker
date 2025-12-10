@@ -154,7 +154,8 @@ const TagsManager = () => {
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>
                     <button onClick={() => setIsCreatingGroup(true)} style={{
-                        background: 'var(--notion-bg)', border: '1px solid var(--notion-border)', borderRadius: '4px',
+                        background: 'transparent', border: '1px solid var(--notion-text)', borderRadius: '4px',
+                        color: 'var(--notion-text)',
                         padding: '6px 12px', fontSize: '14px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer'
                     }}>
                         <FolderOpen size={16} /> New Group
@@ -246,22 +247,20 @@ const TagsManager = () => {
             ))}
 
             {/* --- UNCATEGORIZED --- */}
-            <div style={groupCardStyle}>
-                <div style={groupHeaderStyle}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <FolderOpen size={20} color="var(--notion-text-gray)" />
-                        <span style={{ fontWeight: 600, fontSize: '16px' }}>Uncategorized</span>
+            {tags.filter(t => !t.groupId).length > 0 && (
+                <div style={groupCardStyle}>
+                    <div style={groupHeaderStyle}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <FolderOpen size={20} color="var(--notion-text-gray)" />
+                            <span style={{ fontWeight: 600, fontSize: '16px' }}>Uncategorized</span>
+                        </div>
+                        <button onClick={() => { setIsCreating(true); setNewGroupId(''); }} style={iconButtonStyle} title="Add Tag"><Plus size={16} /></button>
                     </div>
-                    <button onClick={() => { setIsCreating(true); setNewGroupId(''); }} style={iconButtonStyle} title="Add Tag"><Plus size={16} /></button>
+                    <div style={groupBodyStyle}>
+                        {tags.filter(t => !t.groupId).map(tag => renderTagItem(tag))}
+                    </div>
                 </div>
-                <div style={groupBodyStyle}>
-                    {tags.filter(t => !t.groupId).length === 0 ? (
-                        <span style={{ fontSize: '13px', color: 'var(--notion-text-gray)', fontStyle: 'italic' }}>No uncategorized tags.</span>
-                    ) : (
-                        tags.filter(t => !t.groupId).map(tag => renderTagItem(tag))
-                    )}
-                </div>
-            </div>
+            )}
 
         </div>
     );
